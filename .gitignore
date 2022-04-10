@@ -1,0 +1,8 @@
+.idea
+/venv_win
+/venv_lin
+/download/creodias_credentials.py
+/download/data
+/download/__pycache__
+/preprocessing/data
+/preprocessing/__pycache__/
