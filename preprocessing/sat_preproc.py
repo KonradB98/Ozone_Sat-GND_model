@@ -52,7 +52,8 @@ def s5pSingleFilePreProc():
     # data quality value
     qa = ds.groups['PRODUCT'].variables['qa_value'][0]
     # dictionary for desired variables for preprocessing
-    LisboaDict = {'longitude': [], 'latitude':[], 'qa_value':[], 'ozone_total_vertical_column': [], 'ozone_total_vertical_column_precision': [], 'x': [], 'y':[]}
+    LisboaDict = {'longitude': [], 'latitude': [], 'qa_value': [], 'ozone_total_vertical_column': [],
+                  'ozone_total_vertical_column_precision': [], 'x': [], 'y': []}
     # range of indexes where data regarding Lisbon occurs
     xRange, yRange = np.where((lon >= LISBON_COORDINATES_DICT['lon_left']) & (lon <= LISBON_COORDINATES_DICT['lon_right']) & \
                              (lat >= LISBON_COORDINATES_DICT['lat_down']) & (lat <= LISBON_COORDINATES_DICT['lat_up']))
@@ -71,9 +72,50 @@ def s5pSingleFilePreProc():
     vars_df = pd.DataFrame.from_dict(LisboaDict)
     vars_df.to_csv(PDP.joinpath('data/Lisbon/sat/test_Lisbon.csv'))
 
+def s5pMultipleFilePreProc():
+    # list of dataframes
+    dfl = []
+    for f in os.listdir(FILE_PATH_LISBON):
+        print(f)
+        ds = nc.Dataset(FILE_PATH_LISBON.joinpath(f), mode='r')
+        # latitudes
+        lat = np.array(ds.groups['PRODUCT'].variables['latitude'][0])
+        # longitudes
+        lon = np.array(ds.groups['PRODUCT'].variables['longitude'][0])
+        # ozone measurements - Total Ozone Column (TOC)
+        o3 = np.array(ds.groups['PRODUCT'].variables['ozone_total_vertical_column'][0])
+        # ozone measurements precision
+        o3_prec = ds.groups['PRODUCT'].variables['ozone_total_vertical_column_precision'][0]
+        # data quality value
+        qa = ds.groups['PRODUCT'].variables['qa_value'][0]
+        # dictionary for desired variables for preprocessing
+        LisboaDict = {'longitude': [], 'latitude': [], 'qa_value': [], 'ozone_total_vertical_column': [],
+                      'ozone_total_vertical_column_precision': [], 'x': [], 'y': []}
+        # range of indexes where data regarding Lisbon occurs
+        xRange, yRange = np.where(
+            (lon >= LISBON_COORDINATES_DICT['lon_left']) & (lon <= LISBON_COORDINATES_DICT['lon_right']) & \
+            (lat >= LISBON_COORDINATES_DICT['lat_down']) & (lat <= LISBON_COORDINATES_DICT['lat_up']))
+        for i in range(min(xRange), max(xRange) + 1):
+            for j in range(min(yRange), max(yRange) + 1):
+                if lon[i, j] >= LISBON_COORDINATES_DICT['lon_left'] and lon[i, j] <= \
+                        LISBON_COORDINATES_DICT['lon_right'] and lat[i, j] >= LISBON_COORDINATES_DICT[
+                    'lat_down'] and lat[i, j] <= LISBON_COORDINATES_DICT['lat_up']:
+                    LisboaDict['longitude'].append(lon[i, j])
+                    LisboaDict['latitude'].append(lat[i, j])
+                    LisboaDict['ozone_total_vertical_column'].append(o3[i, j])
+                    LisboaDict['ozone_total_vertical_column_precision'].append(o3_prec[i, j])
+                    LisboaDict['qa_value'].append(qa[i, j])
+                    LisboaDict['x'].append(i)
+                    LisboaDict['y'].append(j)
+        vars_df = pd.DataFrame.from_dict(LisboaDict)
+        dfl.append(vars_df)
+    allVarsDict = pd.concat(dfl, axis=0, ignore_index=True)
+    allVarsDict.to_csv(PDP.joinpath('data/Lisbon/sat/test_Lisbon_All.csv'))
+
 if __name__ == "__main__":
-    readNetCDFLisbon()
+    # readNetCDFLisbon()
     # s5pSingleFilePreProc()
+    s5pMultipleFilePreProc()
 
 
 
