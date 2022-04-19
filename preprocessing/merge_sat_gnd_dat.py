@@ -68,6 +68,8 @@ def fitSatGndCoord():
     # write to csv file
     fitDf.to_csv(PDP.joinpath('data/Lisbon/Gnd_Sat_fit.csv'))
 
+def findBestFit():
+    print("Function for proper merge of satellite and gs data")
 
 if __name__ == "__main__":
     print("Hello")
