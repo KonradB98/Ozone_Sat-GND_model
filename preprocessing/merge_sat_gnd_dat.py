@@ -2,11 +2,14 @@ import numpy as np
 import pandas as pd
 import pathlib
 from math import radians, cos, sin, asin, sqrt
+from datetime import datetime
 
 PDP = pathlib.Path(__file__).parents[0]
 SAT_DAT = PDP.joinpath('data/Lisbon/sat/Ozone_S5P.csv')
 GND_DAT = PDP.joinpath('data/Lisbon/gnd/Lisbon_GND_2019_All.csv')
 SAMP_DAT = PDP.joinpath('data/Lisbon/gnd/Lisbon_Samp_Points.csv')
+mDir = pathlib.Path(__file__).parents[7]
+SAT_DAT_2 = mDir.joinpath('Downloads/Ozone_S5P.csv')
 
 """
 Function for calculating distance between 2 points on earth borrowed from:
@@ -70,10 +73,26 @@ def fitSatGndCoord():
 
 def findBestFit():
     print("Function for proper merge of satellite and gs data")
+    # read satellite data to data frame
+    satDf = pd.read_csv(SAT_DAT)
+    # read ground stations metadata (SamplePoint, Longitude, Latitude)
+    # sampDf = pd.read_csv(SAMP_DAT)
+    # # create dictionary for output data (
+    # fitDict = {'samplingpoint': [], 'time': [], 'lon_pix': [], 'lat_pix': [], 'total_ozone_column': [], \
+    #            'total_ozone_column_prec': [], 'q_a': [], 'sp_distance_km': []}
+    for i in range(len(satDf)):
+        pxLon = satDf.loc[i, "pixel center longitude (degrees_east)"]
+        pxLat = satDf.loc[i, "pixel center latitude (degrees_north)"]
+        dateTime = datetime.strptime(satDf.loc[i, "Time"], "%m/%d/%Y %H:%M")
+        if dateTime < datetime(2019, 8, 6):
+            print("elko")
+        else:
+            print("siemka")
 
 if __name__ == "__main__":
     print("Hello")
     # fitSatGndCoord()
+    findBestFit()
 
 
 
