@@ -42,8 +42,9 @@ def satDataMap():
     # take only ozone data from calculated range of indexes (ozone data from Lisbon area)
     o3 = ds.groups['PRODUCT'].variables['ozone_total_vertical_column'][0][min(xRange):max(xRange)+1, min(yRange):max(yRange)+1]
     # define satellite measurements units
-    o3_units = "mol/m^2"
+    o3_units = "DU"
 
+    print(len(lons), len(lats))
     # calculate average of longitudes and latitudes (middle point of the map)
     lon_0 = lons.mean()
     lat_0 = lats.mean()
@@ -139,5 +140,5 @@ def gndDataMap():
 
 if __name__ == "__main__":
     satDataMap()
-    gndDataMap()
+    # gndDataMap()
 
